@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import Card from 'belle/belle-theme/Card';
+import {Card} from 'belle/theme/default';
 import Code from './Code';
 
 let ImageCard = Card.style({

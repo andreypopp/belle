@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Option, Select} from 'belle';
+import {Option, Select} from 'belle/theme/default';
 import Code from './Code';
 import {propertyNameStyle, propertyDescriptionStyle} from './style';
 

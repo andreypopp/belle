@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
-import {Option, Placeholder, Select, Separator, TextInput} from 'belle';
+import {Placeholder, TextInput} from 'belle';
+import {Option, Select, Separator} from 'belle/theme/default';
 import Code from './Code';
 import {propertyNameStyle, propertyDescriptionStyle} from './style';
 

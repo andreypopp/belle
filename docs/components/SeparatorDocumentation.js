@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Option, Select, Separator} from 'belle';
+import {Option, Separator, Select} from 'belle/theme/default';
 import Code from './Code';
 
 const basicCodeExample = `<!-- basic select example with separators -->

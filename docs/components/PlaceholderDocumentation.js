@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
-import {Option, Placeholder, Select} from 'belle';
+import {Placeholder} from 'belle';
+import {Option, Select} from 'belle/theme/default';
 import Code from './Code';
 
 const basicCodeExample = `<!-- basic select example with a placeholder -->

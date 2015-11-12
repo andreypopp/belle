@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import {Card} from 'belle';
+import {Card} from 'belle/theme/default';
 import { Link } from 'react-router';
 import Column from './Column';
 
