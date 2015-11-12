@@ -1,6 +1,14 @@
 import React, {Component} from 'react';
-import {Card} from 'belle';
+import Card from 'belle/belle-theme/Card';
 import Code from './Code';
+
+let ImageCard = Card.style({
+  Root: {
+    borderTop: '1px solid #f2f2f2',
+    width: 265,
+    padding: '20px 0'
+  }
+});
 
 const basicCodeExample = `<!-- basic card example -->
 <Card style={{ borderTop: '1px solid #f2f2f2' }}>
@@ -8,12 +16,18 @@ const basicCodeExample = `<!-- basic card example -->
 </Card>`;
 
 const imageCodeExample = `<!-- image card example -->
-<Card style={{ borderTop: '1px solid #f2f2f2',
-               width: 265,
-               padding: '20px 0' }}>
+let ImageCard = Card.style({
+  Root: {
+    borderTop: '1px solid #f2f2f2',
+    width: 265,
+    padding: '20px 0'
+  }
+})
+
+<ImageCard>
   <img src="images/ngorongoro_caldera_small.jpg"
-       width="100%" />
-</Card>`;
+        width="100%" />
+</ImageCard>`;
 
 export default class CardDocumentation extends Component {
 
@@ -44,12 +58,10 @@ export default class CardDocumentation extends Component {
 
         <h4>Card with a full-width image</h4>
 
-        <Card style={{ borderTop: '1px solid #f2f2f2',
-                       width: 265,
-                       padding: '20px 0' }}>
+        <ImageCard>
           <img src="images/ngorongoro_caldera_small.jpg"
                width="100%" />
-        </Card>
+        </ImageCard>
 
         <Code value={ imageCodeExample } style={ {marginTop: 40} } />
       </div>
