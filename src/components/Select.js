@@ -1,10 +1,8 @@
 import React, {Component, PropTypes} from 'react';
 import ReactDOM from 'react-dom';
+import {attachStylesheet} from 'react-stylesheet';
 import {omit, filter, filterReactChildren, find, first, flattenReactChildren, isEmpty, findIndex, last, uniqueId, has, some} from '../utils/helpers';
 import { canUseDOM } from 'exenv';
-import unionClassNames from '../utils/union-class-names';
-import {injectStyles, removeStyle} from '../utils/inject-style';
-import style from '../style/select';
 import config from '../config/select';
 import isComponentOfType from '../utils/is-component-of-type';
 import {isOption} from '../components/Option';
@@ -39,38 +37,6 @@ function validateChildrenAreOptionsAndMaximumOnePlaceholder(props, propName, com
 }
 
 /**
- * Update hover style for the speficied styleId.
- *
- * @param styleId {string} - a unique id that exists as class attribute in the DOM
- * @param properties {object} - the components properties optionally containing hoverStyle
- */
-function updatePseudoClassStyle(styleId, properties) {
-  const hoverStyle = {
-    ...style.hoverStyle,
-    ...properties.hoverStyle,
-  };
-  const disabledHoverStyle = {
-    ...style.disabledHoverStyle,
-    ...properties.disabledHoverStyle,
-  };
-
-  const styles = [
-    {
-      id: styleId,
-      style: hoverStyle,
-      pseudoClass: 'hover',
-    },
-    {
-      id: styleId,
-      style: disabledHoverStyle,
-      pseudoClass: 'hover',
-      disabled: true,
-    },
-  ];
-  injectStyles(styles);
-}
-
-/**
  * Returns true in case there one more element in the list.
  */
 const hasNext = (list, currentIndex) => {
@@ -91,19 +57,10 @@ const hasPrevious = (list, currentIndex) => {
 function sanitizeSelectedOptionWrapperProps(properties) {
   return omit(properties, [
     'onClick',
-    'style',
     'className',
     'ref',
     'shouldPositionOptions',
     'positionOptions',
-    'focusStyle',
-    'hoverStyle',
-    'activeStyle',
-    'wrapperStyle',
-    'menuStyle',
-    'caretToOpenStyle',
-    'caretToCloseStyle',
-    'disabledCaretToOpenStyle',
     'value',
     'defaultValue',
     'onUpdate',
@@ -116,8 +73,6 @@ function sanitizeSelectedOptionWrapperProps(properties) {
     'onTouchCancel',
     'onMouseDown',
     'onMouseUp',
-    'disabledStyle',
-    'disabledHoverStyle',
   ]);
 }
 
@@ -127,7 +82,6 @@ function sanitizeSelectedOptionWrapperProps(properties) {
  */
 function sanitizeWrapperProps(properties) {
   return omit(properties, [
-    'style',
     'ref',
     'tabIndex',
     'onKeyDown',
@@ -142,7 +96,6 @@ function sanitizeWrapperProps(properties) {
  */
 function sanitizeMenuProps(properties) {
   return omit(properties, [
-    'style',
     'ref',
     'aria-labelledby',
     'role',
@@ -155,10 +108,16 @@ function sanitizeMenuProps(properties) {
  */
 function sanitizeCaretProps(properties) {
   return omit(properties, [
-    'style',
     'ref',
   ]);
 }
+
+let Stylesheet = {
+  Root: 'div',
+  Selected: 'div',
+  Caret: 'span',
+  Menu: 'ul',
+};
 
 /**
  * Select component.
@@ -180,6 +139,7 @@ function sanitizeCaretProps(properties) {
  * - Jet Watson: https://github.com/JedWatson/react-select
  * - Instructure React Team: https://github.com/instructure-react/react-select-box
  */
+@attachStylesheet(Stylesheet)
 export default class Select extends Component {
 
   /*
@@ -254,21 +214,10 @@ export default class Select extends Component {
     className: PropTypes.string,
     shouldPositionOptions: PropTypes.bool,
     positionOptions: PropTypes.func,
-    style: PropTypes.object,
-    focusStyle: PropTypes.object,
-    hoverStyle: PropTypes.object,
-    activeStyle: PropTypes.object,
-    wrapperStyle: PropTypes.object,
-    menuStyle: PropTypes.object,
-    caretToOpenStyle: PropTypes.object,
-    caretToCloseStyle: PropTypes.object,
     wrapperProps: PropTypes.object,
     menuProps: PropTypes.object,
     caretProps: PropTypes.object,
     disabled: PropTypes.bool,
-    disabledStyle: PropTypes.object,
-    disabledHoverStyle: PropTypes.object,
-    disabledCaretToOpenStyle: PropTypes.object,
     onClick: PropTypes.func,
     onTouchCancel: PropTypes.func,
     onMouseDown: PropTypes.func,
@@ -297,16 +246,7 @@ export default class Select extends Component {
     };
   }
 
-  /**
-   * Generates the style-id & inject the focus & hover style.
-   *
-   * The style-id is based on React's unique DOM node id.
-   */
   componentWillMount() {
-    const id = this._reactInternalInstance._rootNodeID.replace(/\./g, '-');
-    this._styleId = `style-id${id}`;
-    updatePseudoClassStyle(this._styleId, this.props);
-
     if (canUseDOM) {
       this.mouseUpOnDocumentCallback = ::this._onMouseUpOnDocument;
       document.addEventListener('mouseup', this.mouseUpOnDocumentCallback);
@@ -336,8 +276,6 @@ export default class Select extends Component {
     }
 
     this.setState(newState);
-    removeStyle(this._styleId);
-    updatePseudoClassStyle(this._styleId, properties);
   }
 
   /**
@@ -381,11 +319,8 @@ export default class Select extends Component {
       const separators = filter(this.children, isSeparator);
       const childrenPresent = !isEmpty(this.options) || !isEmpty(separators);
       if (!previousState.isOpen && this.state.isOpen && childrenPresent) {
-        const menuStyle = {
-          ...style.menuStyle,
-          ...this.props.menuStyle,
-        };
-        menuNode.style.display = menuStyle.display;
+        // XXX: why do we need it? instead of just relying render()
+        menuNode.style.display = 'block';
       }
     }
   }
@@ -394,7 +329,6 @@ export default class Select extends Component {
    * Remove a component's associated styles whenever it gets removed from the DOM.
    */
   componentWillUnmount() {
-    removeStyle(this._styleId);
     if (canUseDOM) {
       document.removeEventListener('mouseup', this.mouseUpOnDocumentCallback);
     }
@@ -778,57 +712,6 @@ export default class Select extends Component {
   }
 
   render() {
-    const defaultStyle = {
-      ...style.style,
-      ...this.props.style,
-    };
-    const hoverStyle = {
-      ...defaultStyle,
-      ...style.hoverStyle,
-      ...this.props.hoverStyle,
-    };
-    const focusStyle = {
-      ...defaultStyle,
-      ...style.focusStyle,
-      ...this.props.focusStyle,
-    };
-    const activeStyle = {
-      ...defaultStyle,
-      ...style.activeStyle,
-      ...this.props.activeStyle,
-    };
-    const disabledStyle = {
-      ...defaultStyle,
-      ...style.disabledStyle,
-      ...this.props.disabledStyle,
-    };
-    const disabledHoverStyle = {
-      ...disabledStyle,
-      ...style.disabledHoverStyle,
-      ...this.props.disabledHoverStyle,
-    };
-    const menuStyle = {
-      ...style.menuStyle,
-      ...this.props.menuStyle,
-    };
-    const caretToCloseStyle = {
-      ...style.caretToCloseStyle,
-      ...this.props.caretToCloseStyle,
-    };
-    const caretToOpenStyle = {
-      ...style.caretToOpenStyle,
-      ...this.props.caretToOpenStyle,
-    };
-    const disabledCaretToOpenStyle = {
-      ...caretToOpenStyle,
-      ...style.disabledCaretToOpenStyle,
-      ...this.props.disabledCaretToOpenStyle,
-    };
-    const wrapperStyle = {
-      ...style.wrapperStyle,
-      ...this.props.wrapperStyle,
-    };
-
     let selectedOptionOrPlaceholder;
     if (this.state.selectedValue) {
       const selectedEntry = find(this.children, (entry) => {
@@ -846,74 +729,58 @@ export default class Select extends Component {
 
     const separators = filter(this.children, isSeparator);
     const childrenNotPresent = isEmpty(this.options) && isEmpty(separators);
-    const computedMenuStyle = this.props.disabled || !this.state.isOpen || childrenNotPresent ? { display: 'none' } : menuStyle;
     const hasCustomTabIndex = this.props.wrapperProps && this.props.wrapperProps.tabIndex;
     let tabIndex = hasCustomTabIndex ? this.props.wrapperProps.tabIndex : '0';
 
-    let selectedOptionWrapperStyle;
     if (this.props.disabled) {
-      if (this.state.isTouchedToToggle) {
-        selectedOptionWrapperStyle = disabledHoverStyle;
-      } else {
-        selectedOptionWrapperStyle = disabledStyle;
-      }
-
       tabIndex = -1;
-    } else {
-      if (this.state.isActive) {
-        selectedOptionWrapperStyle = activeStyle;
-      } else if (this.state.isFocused) {
-        selectedOptionWrapperStyle = focusStyle;
-      } else if (this.state.isTouchedToToggle) {
-        selectedOptionWrapperStyle = hoverStyle;
-      } else {
-        selectedOptionWrapperStyle = defaultStyle;
-      }
     }
 
-    let caretStyle;
-    if (this.props.disabled) {
-      caretStyle = disabledCaretToOpenStyle;
-    } else if (this.state.isOpen) {
-      caretStyle = caretToCloseStyle;
-    } else {
-      caretStyle = caretToOpenStyle;
-    }
+    let {Root, Selected, Caret, Menu} = this.props.stylesheet;
 
     return (
-      <div style={ wrapperStyle }
-           tabIndex={ tabIndex }
-           onKeyDown={ ::this._onKeyDown }
-           onBlur={ ::this._onBlur }
-           onFocus={ ::this._onFocus }
-           ref="wrapper"
-           {...this.state.wrapperProps} >
+      <Root tabIndex={ tabIndex }
+            onKeyDown={ ::this._onKeyDown }
+            onBlur={ ::this._onBlur }
+            onFocus={ ::this._onFocus }
+            ref="wrapper"
+            {...this.state.wrapperProps} >
 
-        <div onClick={ ::this._onClickToggleMenu }
-             onTouchStart={ ::this._onTouchStartToggleMenu }
-             onTouchEnd={ ::this._onTouchEndToggleMenu }
-             onTouchCancel={ ::this._onTouchCancelToggleMenu }
-             onContextMenu={ ::this._onContextMenu }
-             onMouseDown = { ::this._onMouseDown }
-             onMouseUp = { ::this._onMouseUp }
-             style={ selectedOptionWrapperStyle }
-             className={ unionClassNames(this.props.className, this._styleId) }
-             ref="selectedOptionWrapper"
-             role="button"
-             aria-expanded={ this.state.isOpen }
-             id={ this.state.selectedOptionWrapperId }
-             {...this.state.selectedOptionWrapperProps} >
+        <Selected state={{
+                    disabled: this.props.disabled && !this.state.isTouchedToToggle,
+                    disabledHover: this.props.disabled && this.state.isTouchedToToggle,
+                    active: this.state.isActive,
+                    focus: this.state.isFocused,
+                    hover: this.state.isTouchedToToggle,
+                  }}
+                  onClick={ ::this._onClickToggleMenu }
+                  onTouchStart={ ::this._onTouchStartToggleMenu }
+                  onTouchEnd={ ::this._onTouchEndToggleMenu }
+                  onTouchCancel={ ::this._onTouchCancelToggleMenu }
+                  onContextMenu={ ::this._onContextMenu }
+                  onMouseDown = { ::this._onMouseDown }
+                  onMouseUp = { ::this._onMouseUp }
+                  ref="selectedOptionWrapper"
+                  role="button"
+                  aria-expanded={ this.state.isOpen }
+                  id={ this.state.selectedOptionWrapperId }
+                  {...this.state.selectedOptionWrapperProps} >
           { selectedOptionOrPlaceholder }
-          <span style={ caretStyle }
+          <Caret
+            state={{
+              disabled: this.props.disabled,
+              open: this.state.isOpen,
+              close: !this.state.isOption
+            }}
             {...this.state.caretProps}>
-          </span>
-        </div>
+          </Caret>
+        </Selected>
 
-        <ul style={ computedMenuStyle }
-            role="listbox"
-            aria-labelledby={ this.state.selectedOptionWrapperId }
-            ref="menu"
-            {...this.state.menuProps} >
+        <Menu style={this.props.disabled || !this.state.isOpen || childrenNotPresent ? {display: 'none'} : undefined}
+              role="listbox"
+              aria-labelledby={ this.state.selectedOptionWrapperId }
+              ref="menu"
+              {...this.state.menuProps} >
           {
             React.Children.map(this.children, (entry, index) => {
               if (isOption(entry)) { // filter out all non-Option Components
@@ -942,9 +809,9 @@ export default class Select extends Component {
               }
             })
           }
-        </ul>
+        </Menu>
 
-      </div>
+      </Root>
     );
   }
 }

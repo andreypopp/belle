@@ -1,6 +1,6 @@
 import Option from '../components/Option';
 
-let ThemedOption = Option.style({
+export default Option.style({
 
   Root: {
     boxSizing: 'border-box',
@@ -60,7 +60,3 @@ let ThemedOption = Option.style({
 
   }
 });
-
-ThemedOption._isBelleOption = true;
-
-export default ThemedOption;

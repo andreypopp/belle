@@ -1,6 +1,6 @@
 import Separator from '../components/Separator';
 
-let ThemedSeparator = Separator.style({
+export default Separator.style({
   Root: {
     boxSizing: 'border-box',
     color: '#666',
@@ -8,7 +8,3 @@ let ThemedSeparator = Separator.style({
     padding: 10,
   }
 });
-
-ThemedSeparator._isBelleSeparator = true;
-
-export default ThemedSeparator;

@@ -30,7 +30,12 @@ const selectConfig = {
   positionOptions(selectComponent) {
     const menuNode = ReactDOM.findDOMNode(selectComponent.refs.menu);
     const menuStyle = window.getComputedStyle(menuNode, null);
-    const menuWidth = parseFloat(menuStyle.getPropertyValue('width'));
+
+    const selectedOptionWrapperNode = ReactDOM.findDOMNode(selectComponent.refs.selectedOptionWrapper);
+    const selectedOptionWrapperStyle = window.getComputedStyle(selectedOptionWrapperNode, null);
+    const selectedOptionWrapperPaddingTop = parseFloat(selectedOptionWrapperStyle.getPropertyValue('padding-top'));
+
+    const menuWidth = parseFloat(selectedOptionWrapperStyle.getPropertyValue('width'));
 
     // In case of a placeholder no option is focused on initially
     let option;
@@ -53,9 +58,6 @@ const selectConfig = {
     const optionPaddingTop = parseFloat(optionStyle.getPropertyValue('padding-top'));
     const optionPaddingLeft = parseFloat(optionStyle.getPropertyValue('padding-top'));
 
-    const selectedOptionWrapperNode = ReactDOM.findDOMNode(selectComponent.refs.selectedOptionWrapper);
-    const selectedOptionWrapperStyle = window.getComputedStyle(selectedOptionWrapperNode, null);
-    const selectedOptionWrapperPaddingTop = parseFloat(selectedOptionWrapperStyle.getPropertyValue('padding-top'));
 
     const newTop = option.offsetTop + optionPaddingTop - selectedOptionWrapperPaddingTop + menuTopBorderWidth;
     const newLeft = option.offsetLeft + optionPaddingLeft;
