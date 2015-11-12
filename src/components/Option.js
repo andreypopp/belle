@@ -1,6 +1,6 @@
 import React, {Component, PropTypes} from 'react';
+import {attachStylesheet} from 'react-stylesheet';
 import {omit} from '../utils/helpers';
-import style from '../style/option';
 
 /**
  * Returns an object with properties that are relevant for the wrapping div.
@@ -16,11 +16,16 @@ function sanitizeChildProps(properties) {
   ]);
 }
 
+let Stylesheet = {
+  Root: 'div'
+};
+
 /**
  * Option component.
  *
  * This component should be used together with Belle's Select.
  */
+@attachStylesheet(Stylesheet)
 export default class Option extends Component {
 
   constructor(properties) {
@@ -29,6 +34,8 @@ export default class Option extends Component {
       childProps: sanitizeChildProps(properties),
     };
   }
+
+  static _isBelleOption = true;
 
   static displayName = 'Option';
 
@@ -71,40 +78,22 @@ export default class Option extends Component {
   }
 
   render() {
-    let optionStyle;
-
-    if (this.props._isDisplayedAsSelected) {
-      optionStyle = {
-        ...style.selectStyle,
-        ...this.props.selectStyle,
-      };
-      if (this.context.isDisabled) {
-        optionStyle = {
-          ...optionStyle,
-          ...style.disabledSelectStyle,
-          ...this.props.disabledSelectStyle,
-        };
-      }
-    } else {
-      optionStyle = {
-        ...style.style,
-        ...this.props.style,
-      };
-      if (this.context.isHoveredValue === this.props.value) {
-        optionStyle = {
-          ...optionStyle,
-          ...style.hoverStyle,
-          ...this.props.hoverStyle,
-        };
-      }
-    }
-
+    let {Root} = this.props.stylesheet;
+    let rootUIState = {
+      notSelectedHover: !this.props._isDisplayedAsSelected && this.context.isHoveredValue === this.props.value,
+      selected: this.props._isDisplayedAsSelected,
+      selectedDisabled: this.props._isDisplayedAsSelected && this.context.isDisabled
+    };
     return (
-      <div data-belle-value={ this.props.value }
-           style={ optionStyle }
-           {...this.state.childProps}>
+      <Root data-belle-value={ this.props.value }
+            state={ rootUIState }
+            {...this.state.childProps}>
         { this.props.children }
-      </div>
+      </Root>
     );
   }
+}
+
+export function isOption(element) {
+  return element && element.type && element.type._isBelleOption;
 }

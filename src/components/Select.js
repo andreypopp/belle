@@ -7,7 +7,7 @@ import {injectStyles, removeStyle} from '../utils/inject-style';
 import style from '../style/select';
 import config from '../config/select';
 import isComponentOfType from '../utils/is-component-of-type';
-import Option from '../components/Option';
+import {isOption} from '../components/Option';
 import Placeholder from '../components/Placeholder';
 import Separator from '../components/Separator';
 
@@ -16,13 +16,6 @@ import Separator from '../components/Separator';
  */
 function isPlaceholder(reactElement) {
   return isComponentOfType(Placeholder, reactElement);
-}
-
-/**
- * Returns true if the provided property is a Option component from Belle.
- */
-function isOption(reactElement) {
-  return isComponentOfType(Option, reactElement);
 }
 
 /**
