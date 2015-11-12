@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom';
 import isComponentOfType from '../utils/is-component-of-type.js';
 import {filterReactChildren, findIndex} from '../utils/helpers';
 import {isOption} from '../components/Option';
-import Separator from '../components/Separator';
+import {isSeparator} from '../components/Separator';
 
 /**
  * Returns the index of the entry with a certain value from the component's
@@ -11,9 +11,7 @@ import Separator from '../components/Separator';
  * The index search includes separator & option components.
  */
 const findIndexOfSelectedOption = (component) => {
-  const filterFunction = (child) =>{
-    return (isOption(child) || isComponentOfType(Separator, child));
-  }
+  const filterFunction = (child) => isOption(child) || isSeparator(child);
   return findIndex(filterReactChildren(component.props.children, filterFunction), (element) => {
     return element.props.value === component.state.selectedValue;
   });

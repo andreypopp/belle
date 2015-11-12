@@ -9,20 +9,13 @@ import config from '../config/select';
 import isComponentOfType from '../utils/is-component-of-type';
 import {isOption} from '../components/Option';
 import Placeholder from '../components/Placeholder';
-import Separator from '../components/Separator';
+import {isSeparator} from '../components/Separator';
 
 /**
  * Returns true if the provided property is a Placeholder component from Belle.
  */
 function isPlaceholder(reactElement) {
   return isComponentOfType(Placeholder, reactElement);
-}
-
-/**
- * Returns true if the provided property is a Separator component from Belle.
- */
-function isSeparator(reactElement) {
-  return isComponentOfType(Separator, reactElement);
 }
 
 /**
