@@ -1,4 +1,4 @@
-import Separator from '../components/Separator';
+import Separator from '../../components/Separator';
 
 export default Separator.style({
   Root: {

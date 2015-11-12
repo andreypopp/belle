@@ -1,4 +1,4 @@
-import Option from '../components/Option';
+import Option from '../../components/Option';
 
 export default Option.style({
 
